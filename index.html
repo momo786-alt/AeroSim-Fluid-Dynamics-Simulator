@@ -3,76 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AeroSim v1.0 | Discrete Fluid Dynamics Dashboard</title>
+    <title>AeroSim v2.0 | Fluid Dynamics Workbench</title>
     <style>
         :root {
-            --bg-primary: #0a0a0f;
-            --bg-surface: #12121a;
+            --bg-primary: #08080c;
+            --bg-surface: #111118;
             --border-color: #222235;
-            --accent-glow: #007acc;
-            --accent-muted: #004477;
+            --accent-glow: #00e678;
+            --accent-blue: #007acc;
             --text-main: #f0f0f5;
             --text-muted: #888899;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-main);
             margin: 0;
-            padding: 24px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            box-sizing: border-box;
         }
 
         header {
             text-align: center;
-            margin-bottom: 24px;
-            max-width: 800px;
+            margin-bottom: 20px;
             width: 100%;
+            max-width: 800px;
         }
 
         h1 {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            margin: 0 0 8px 0;
-            background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+            margin: 0 0 6px 0;
+            background: linear-gradient(135deg, #fff 30%, var(--text-muted) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .subtitle {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-muted);
             margin: 0;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
         }
 
         .app-container {
             background-color: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            max-width: 850px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            max-width: 840px;
             width: 100%;
             box-sizing: border-box;
         }
 
         .canvas-wrapper {
             position: relative;
-            background-color: #030305;
-            border-radius: 6px;
+            background-color: #020204;
+            border-radius: 8px;
             overflow: hidden;
             border: 1px solid var(--border-color);
         }
 
         canvas {
             display: block;
+            width: 100%;
+            height: auto;
             cursor: crosshair;
         }
 
@@ -80,61 +83,65 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 20px;
-            padding-top: 16px;
+            margin-top: 16px;
+            padding-top: 14px;
             border-top: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .telemetry {
-            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-            font-size: 12px;
+            font-family: monospace;
+            font-size: 11px;
             color: var(--text-muted);
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.3);
             padding: 6px 12px;
             border-radius: 4px;
             border: 1px solid var(--border-color);
+            letter-spacing: 0.5px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
         }
 
         button {
-            padding: 10px 20px;
-            font-size: 13px;
+            padding: 8px 16px;
+            font-size: 12px;
             font-weight: 600;
-            letter-spacing: 0.5px;
             cursor: pointer;
             background-color: transparent;
             color: var(--text-main);
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s ease;
         }
 
         button:hover {
-            background-color: #ffffff0a;
+            background-color: rgba(255,255,255,0.05);
             border-color: var(--text-muted);
         }
 
-        button:active {
-            transform: scale(0.98);
+        button.danger:hover {
+            background-color: rgba(230, 50, 50, 0.15);
+            border-color: #e63232;
+            color: #e63232;
         }
 
         footer {
-            margin-top: 32px;
-            font-size: 12px;
+            margin-top: 24px;
+            font-size: 11px;
             color: var(--text-muted);
             letter-spacing: 0.5px;
-        }
-        
-        footer a {
-            color: var(--accent-glow);
-            text-decoration: none;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>AeroSim // Vector Dynamics Workbench</h1>
-        <p class="subtitle">Computational Fluid Dynamics & Boundary Layer Simulation</p>
+        <h1>AeroSim v2.0 // Computational Fluid Dynamics</h1>
+        <p class="subtitle">Vector Velocity Field & Boundary Streamline Simulator</p>
     </header>
 
     <div class="app-container">
@@ -143,83 +150,153 @@
         </div>
 
         <div class="control-bar">
-            <div class="telemetry" id="telemetryData">System: Operational // Mouse: X: --- Y: ---</div>
-            <button id="clearBtn">Reset Canvas Grid</button>
+            <div class="telemetry" id="telemetryData">Status: Streamlines Active // Fluid Mode: Laminar Flow</div>
+            <div class="btn-group">
+                <button id="clearBtn" class="danger">Clear Obstacles</button>
+            </div>
         </div>
     </div>
 
     <footer>
-        Designed & Programmed independently for Admissions Portfolio Review
+        Designed & Programmed independently for US University Admissions Portfolio Review
     </footer>
 
     <script>
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
         const telemetry = document.getElementById('telemetryData');
+        
         let isDrawing = false;
+        
+        const width = canvas.width;
+        const height = canvas.height;
 
-        function initializeGrid() {
-            // Draw background field
-            ctx.fillStyle = '#040407';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw precise engineering structural grid lines
-            ctx.strokeStyle = '#12121f';
-            ctx.lineWidth = 1;
-            
-            for(let x = 0; x < canvas.width; x += 40) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        // Use a grid downsampled by 4 to keep collision calculation bulletproof and highly performant
+        const scale = 4;
+        const gridW = Math.ceil(width / scale);
+        const gridH = Math.ceil(height / scale);
+        
+        // Create 2D grid matrix mapping solid obstacles (1 = solid, 0 = fluid field)
+        const grid = Array(gridW).fill().map(() => Array(gridH).fill(0));
+
+        // Seed smooth aerodynamic particles
+        const numParticles = 350;
+        const particles = [];
+
+        class StreamlineParticle {
+            constructor(randomX = false) {
+                this.reset();
+                if (randomX) {
+                    this.x = Math.random() * width;
+                }
             }
-            for(let y = 0; y < canvas.height; y += 40) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+
+            reset() {
+                this.x = 0;
+                this.y = Math.random() * height;
+                this.vx = 3.5 + Math.random() * 1.0; // Uniform flow speed from left boundary
+                this.vy = 0;
+                this.age = 0;
+                this.maxAge = 150 + Math.random() * 100;
+            }
+
+            update() {
+                this.age++;
+                
+                // Fetch corresponding grid cell indices
+                let gX = Math.floor(this.x / scale);
+                let gY = Math.floor(this.y / scale);
+
+                // Safe check within screen boundaries
+                if (gX >= 0 && gX < gridW && gY >= 0 && gY < gridH) {
+                    // Check if current or next position hits an obstacle boundary wall
+                    if (grid[gX][gY] === 1) {
+                        // Look up and down to find closest free fluid channel pathways
+                        let upwardFree = -1;
+                        let downwardFree = -1;
+
+                        for (let d = 1; d < 30; d++) {
+                            if (gY - d >= 0 && grid[gX][gY - d] === 0) {
+                                upwardFree = d;
+                                break;
+                            }
+                        }
+                        for (let d = 1; d < 30; d++) {
+                            if (gY + d < gridH && grid[gX][gY + d] === 0) {
+                                downwardFree = d;
+                                break;
+                            }
+                        }
+
+                        // Route vector fluid acceleration away from obstacle boundary curves
+                        if (upwardFree !== -1 && (downwardFree === -1 || upwardFree <= downwardFree)) {
+                            this.vy = -2.2;
+                        } else if (downwardFree !== -1) {
+                            this.vy = 2.2;
+                        } else {
+                            this.reset();
+                            return;
+                        }
+                    } else {
+                        // Smoothly decay vertical component back towards laminar airflow profiles
+                        this.vy *= 0.88;
+                    }
+                }
+
+                // Advance kinematics parameters
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Handle system wrap rules or absolute age exhaustion thresholds
+                if (this.x > width || this.y < 0 || this.y > height || this.age > this.maxAge) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = 'rgba(0, 230, 120, 0.6)';
+                ctx.fillRect(this.x, this.y, 2, 2);
             }
         }
 
-        // Mouse Tracing Architecture
-        canvas.addEventListener('mousedown', (e) => {
-            isDrawing = true;
-            draw(e);
-        });
-
-        canvas.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const x = Math.round(e.clientX - rect.left);
-            const y = Math.round(e.clientY - rect.top);
-            
-            // Output active engineering coordinates dynamically to screen tool
-            if (x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height) {
-                telemetry.textContent = `Boundary Layer Tracking // X: ${x}px Y: ${y}px`;
-            }
-            draw(e);
-        });
-
-        window.addEventListener('mouseup', () => {
-            isDrawing = false;
-            telemetry.textContent = `System: Operational // Mouse: Idle`;
-        });
-
-        function draw(e) {
-            if (!isDrawing) return;
-            
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // Render solid geometric boundary boundary wall points
-            ctx.fillStyle = '#007acc';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#007acc';
-            ctx.beginPath();
-            ctx.arc(x, y, 10, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Reset shadow rules to protect system optimization paths
-            ctx.shadowBlur = 0;
+        // Initialize distributed system state arrays
+        for (let i = 0; i < numParticles; i++) {
+            particles.push(new StreamlineParticle(true));
         }
 
-        // Initialize execution sequences
-        initializeGrid();
-        document.getElementById('clearBtn').addEventListener('click', initializeGrid);
-    </script>
-</body>
-</html>
+        // Main Animation Loop Execution Architecture
+        function renderLoop() {
+            // Apply frame trails to emphasize fluid velocity fields beautifully
+            ctx.fillStyle = 'rgba(4, 4, 7, 0.12)';
+            ctx.fillRect(0, 0, width, height);
+
+            // Render precise vector structural layouts grid points
+            ctx.fillStyle = 'rgba(30, 30, 50, 0.15)';
+            for (let gx = 0; gx < gridW; gx += 10) {
+                for (let gy = 0; gy < gridH; gy += 10) {
+                    ctx.fillRect(gx * scale, gy * scale, 1, 1);
+                }
+            }
+
+            // Draw user designed solid airfoils/obstacles surfaces
+            ctx.fillStyle = 'rgba(0, 122, 204, 0.9)';
+            for (let gx = 0; gx < gridW; gx++) {
+                for (let gy = 0; gy < gridH; gy++) {
+                    if (grid[gx][gy] === 1) {
+                        ctx.fillRect(gx * scale, gy * scale, scale, scale);
+                    }
+                }
+            }
+
+            // Step active streamlines across simulation space
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            requestAnimationFrame(renderLoop);
+        }
+
+        // Mouse Drag Tracking Mechanisms
+        function addObstacle(e) {
+            const rect = canvas.getBoundingClientRect();
